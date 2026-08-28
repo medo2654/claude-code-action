@@ -1,0 +1,26 @@
+name: Temporary image path check
+
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  bounded-check:
+    if: contains(github.event.comment.body, '@claude')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      issues: read
+      pull-requests: read
+      actions: read
+    steps:
+      - name: Checkout trusted base
+        uses: actions/checkout@v4
+      - name: Run local action path without model credentials
+        uses: ./
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          allowed_non_write_users: '*'
+          path_to_claude_code_executable: /bin/false
+          prompt: 'NOOP bounded verification only'
